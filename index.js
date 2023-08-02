@@ -26,9 +26,10 @@ const __dirname = dirname(__filename);
 const app = express();
 
 app.use(cors({
-    origin: 'https://front-end-jami3aty.vercel.app/',
-    credentials: true
+  origin: 'https://front-end-jami3aty.vercel.app',
+  credentials: true,
 }));
+
 
 
 dotenv.config();
