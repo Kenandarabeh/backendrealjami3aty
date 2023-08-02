@@ -63,7 +63,7 @@ app.use("/api/institute", instituteRoutes)
 app.use("/api/level", levelRoutes)
 app.use("/api/specialization", specializationRoutes)
 
-
+app.get("/",(req,res)=>{res.json("Hello");})
 
 app.use((err, req, res, next) => {
     const status = err.status || 500;
