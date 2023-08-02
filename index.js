@@ -24,12 +24,21 @@ const __dirname = dirname(__filename);
 
 
 const app = express();
+const allowedOrigins = ['https://front-end-jami3aty.vercel.app', 'https://other-allowed-origin.com'];
+
+// Configure CORS with allowed origins
 app.use(cors({
-  origin: ['https://front-end-jami3aty.vercel.app'],
+  origin: function (origin, callback) {
+    // Check if the origin is in the allowed list or if it's a CORS preflight request (no origin)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['POST', 'GET'],
   credentials: true,
 }));
-
 
 
 dotenv.config();
