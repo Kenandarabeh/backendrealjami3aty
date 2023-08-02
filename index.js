@@ -28,7 +28,7 @@ const allowedOrigins = ['https://front-end-jami3aty.vercel.app', 'https://other-
 
 // Configure CORS with allowed origins
 app.use(cors({
-  origin: 'https://front-end-jami3aty-fb28.vercel.app',
+  origin: 'https://jami3aty-13iz.onrender.com',
   methods: ['POST', 'GET'],
   credentials: true,
 }));
