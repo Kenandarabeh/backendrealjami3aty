@@ -61,6 +61,7 @@ export const signup = async (req, res, next) => {
 export const signin = async (req, res, next) => {
 
     try {
+        res.setHeader('Access-Control-Allow-Origin','https://front-end-jami3aty-fb28.vercel.app');
         const user = await User.findOne({ email: req.body.email })
         if (!user) return next(createError(404, "user not found!"))
 
