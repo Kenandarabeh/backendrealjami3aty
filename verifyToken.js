@@ -6,7 +6,7 @@ import createError from "./error.js";
 const verifyToken = (req, res, next) => {
     var token = req.cookies.access_token;
     if (!token) return next(createError(401, "you are not authenticated!"))
-    Jwt.verify(token, process.env.Jwt, (err, user) => {
+    Jwt.verify(token, process.env.JWT, (err, user) => {
 
         if (err) return next(createError(403, "Token is not valid"))
         req.user = user;

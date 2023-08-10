@@ -4,6 +4,8 @@ import Chapter from '../models/Chapter.js';
 import path, { dirname } from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import cloudinary from '../cloudinary.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,9 +54,14 @@ export const deleteCourse = async (req, res, next) => {
         // Delete the associated files and remove the chapters
         for (const chapter of chapters) {
             if (chapter.file) {
-                const filePath = path.resolve(chapter.file);
-                const filePath2 = path.resolve(filePath);
-                fs.unlinkSync(filePath);
+                try {
+                    const public_id = chapter.file.split('/').slice(-1)[0].split('.')[0];
+                    await cloudinary.uploader.destroy(public_id);
+                }
+                catch (err) {
+                    res.status(200).json({ message: err.message });
+                    next();
+                }
             }
             await chapter.deleteOne();
         }
@@ -81,26 +88,26 @@ export const deleteCourse = async (req, res, next) => {
 // update
 export const updateCourse = async (req, res, next) => {
     try {
-      const courseId = req.params.id;
-  
-      const course = await Course.findById(courseId);
-      
-      if (!course) {
-        throw createError(404, "Course not found!");
-      }
-  
-      // Updating the course's information based on the request body
-      course.name = req.body.name;
-      course.level = req.body.level;
-      course.specialization = req.body.specialization;
-  
-      const updatedCourse = await course.save();
-  
-      res.status(200).json(updatedCourse);
+        const courseId = req.params.id;
+
+        const course = await Course.findById(courseId);
+
+        if (!course) {
+            throw createError(404, "Course not found!");
+        }
+
+        // Updating the course's information based on the request body
+        course.name = req.body.name;
+        course.level = req.body.level;
+        course.specialization = req.body.specialization;
+
+        const updatedCourse = await course.save();
+
+        res.status(200).json(updatedCourse);
     } catch (error) {
-      next(error);
+        next(error);
     }
-  };
+};
 
 
 

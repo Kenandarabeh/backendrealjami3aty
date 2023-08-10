@@ -4,6 +4,8 @@ import createError from 'http-errors';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import fs from 'fs';
+import cloudinary from '../cloudinary.js';
+
 
 
 
@@ -17,12 +19,19 @@ const __dirname = dirname(__filename);
 // add chapter 
 export const addChapter = async (req, res, next) => {
     try {
+        console.log(cloudinary.config());
         const newChapter = new Chapter({
             name: req.body.name,
             src: req.body.src,
             CourseId: req.params.CourseId,
-            file: req.file ? req.file.path : null,
+            file: null, // We'll update this after handling the file upload
         });
+
+        // Upload the file to Cloudinary if it exists
+        if (req.file) {
+            const cloudinaryUploadResult = await cloudinary.uploader.upload(req.file.path);
+            newChapter.file = cloudinaryUploadResult.secure_url;
+        }
 
         const course = await Course.findById(req.params.CourseId);
         if (!course) {
@@ -32,9 +41,11 @@ export const addChapter = async (req, res, next) => {
         const savedChapter = await newChapter.save();
         res.status(201).json(savedChapter);
     } catch (err) {
+        res.status(201).json(cloudinary.config());
         next(err);
     }
 };
+
 
 
 
@@ -88,17 +99,15 @@ export const deleteChapter = async (req, res, next) => {
 
         // Delete the file if it exists
         if (chapter.file) {
-            const filePath = path.resolve(chapter.file);
-            const filePath2 = path.resolve(filePath);
-
-            console.log(filePath2)
-            fs.unlink(filePath2, (err) => {
-                if (err) {
-                    console.error('Error deleting file:', err);
-                }
-            });
+            try {
+                const public_id = chapter.file.split('/').slice(-1)[0].split('.')[0];
+                await cloudinary.uploader.destroy(public_id);
+            }
+            catch (err) {
+                res.status(200).json({ message: err.message });
+                next();
+            }
         }
-
         await Chapter.deleteOne({ _id: req.params.ChapterId });
         res.status(200).json('The chapter has been deleted.');
     } catch (err) {
