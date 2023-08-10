@@ -26,7 +26,7 @@ const __dirname = dirname(__filename);
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://jami3aty-0-0-2.onrender.com',
     credentials: true
 }));
 
